@@ -37,12 +37,22 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>3.12.11</version>
+		</dependency>
 
-		<!-- DESCOMENTAR CUANDO TENGAMOS EL CLUSTER DE MONGO <dependency> <groupId>org.springframework.boot</groupId> 
-			<artifactId>spring-boot-starter-data-jpa</artifactId> </dependency> <dependency> 
-			<groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-mongodb</artifactId> 
-			</dependency> <dependency> <groupId>org.mongodb</groupId> <artifactId>mongo-java-driver</artifactId> 
-			<version>3.12.11</version> </dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<version>2.7.5</version>
+		</dependency>
 	</dependencies>
 
 	<build>
