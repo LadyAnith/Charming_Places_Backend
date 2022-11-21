@@ -1,8 +1,8 @@
 package com.charmingplaces.service;
 
-import com.charmingplaces.pojo.PhotoDto;
+import com.charmingplaces.pojo.CreatePlaceRequestDto;
 
 public interface ImageUploadService {
 
-	public void uploadImage(PhotoDto photo);
+	public CreatePlaceRequestDto uploadImage(CreatePlaceRequestDto photo);
 }

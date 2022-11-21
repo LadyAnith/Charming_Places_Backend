@@ -26,6 +26,7 @@ public class Image {
 	private int heigh;
 	private int size;
 	private String link;
+	//TODO esto no va fino llegan numeros de la api de imgur hay que transformarlo a date
 	private Timestamp datetime;
 
 }

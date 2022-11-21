@@ -15,5 +15,5 @@ public class ImageDto {
 	
 	private int status;
 	private boolean success;
-	private Image data;
+	private Image data = new Image();
 }
