@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.charmingplaces.entity.Place;
+import com.charmingplaces.pojo.PlacesInsideAreaRequestDto;
+import com.charmingplaces.pojo.PlacesListResponseDto;
 import com.charmingplaces.pojo.PlacesNearRequestDto;
-import com.charmingplaces.pojo.PlacesNearResponseDto;
 
 
 public interface PlaceService {
@@ -19,6 +20,8 @@ public interface PlaceService {
 
 	public Optional<Place> update(Place place);
 
-	public PlacesNearResponseDto findNear(PlacesNearRequestDto placesNearRequestDto);
+	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto);
+
+	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request);
 
 }

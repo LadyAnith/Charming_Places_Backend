@@ -1,27 +1,27 @@
 package com.charmingplaces.service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.geo.Metrics;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 
+import com.charmingplaces.controller.PlaceController;
 import com.charmingplaces.entity.Place;
+import com.charmingplaces.pojo.PlacesDto;
+import com.charmingplaces.pojo.PlacesInsideAreaRequestDto;
+import com.charmingplaces.pojo.PlacesListResponseDto;
 import com.charmingplaces.pojo.PlacesNearRequestDto;
-import com.charmingplaces.pojo.PlacesNearResponseDto;
-import com.charmingplaces.pojo.PlacesNearResponseDto.PlacesDto;
 import com.charmingplaces.repository.PlaceRepository;
-import com.mongodb.client.model.geojson.Point;
-import com.mongodb.client.model.geojson.Position;
 
 @Service
 public class PlaceServiceImpl implements PlaceService{
 	
+	private static final Logger LOG = LoggerFactory.getLogger(PlaceController.class);
 
 	@Autowired
 	PlaceRepository repo;
@@ -61,17 +61,67 @@ public class PlaceServiceImpl implements PlaceService{
 	}
 
 	@Override
-	public PlacesNearResponseDto findNear(PlacesNearRequestDto placesNearRequestDto) {
+	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto) {
 		
-		String query = "{location: {$near: {$maxDistance: %s, $geometry: {type: \"%s\", coordinates: [%s]}}}}";
+		String query = "{location: {$near: {$maxDistance: %s, $geometry: {type: \"Point\", coordinates: [%s]}}}}";
 		String coordinates = String.format("%s,%s", placesNearRequestDto.getXcoord(),placesNearRequestDto.getYcoord() );
-		String queryFormat = String.format(query, 1000, "Point", coordinates);
+		String queryFormat = String.format(query, 1000, coordinates);
 		
 		BasicQuery bquery = new BasicQuery(queryFormat);
 		
 		List<Place> data = mongoTemplate.find(bquery, Place.class);
 		
-		PlacesNearResponseDto result = new PlacesNearResponseDto();
+		PlacesListResponseDto result = placesToplacesDto(data);
+		
+		return result;
+	}
+
+	@Override
+	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request) {
+		
+
+		String query = "{location: {$geoWithin: {$box: [%s]}}}";
+
+		String listCoordinates = getBoxPoints(request);
+		String queryFormat = String.format(query, listCoordinates);
+
+		LOG.info("query : {}", queryFormat);
+		
+		
+		BasicQuery bquery = new BasicQuery(queryFormat);
+		
+		List<Place> data = mongoTemplate.find(bquery, Place.class);
+		
+		PlacesListResponseDto result = placesToplacesDto(data);
+		
+		LOG.info("lugares encontrados {} : {}", result.getData().size(), result.getData());
+
+		return result;
+	}
+
+	private String getBoxPoints(PlacesInsideAreaRequestDto request) {
+		StringBuilder sb = new StringBuilder();
+
+
+		sb.append("[");
+		sb.append(request.getGeoPointTopLeft().getXcoord());
+		sb.append(",");
+		sb.append(request.getGeoPointTopLeft().getYcoord());
+		sb.append("]");
+		sb.append(",");
+		sb.append("[");
+		sb.append(request.getGeoPointBottomRight().getXcoord());
+		sb.append(",");
+		sb.append(request.getGeoPointBottomRight().getYcoord());
+		sb.append("]");
+
+		
+		return sb.toString();
+
+	}
+
+	private PlacesListResponseDto placesToplacesDto(List<Place> data) {
+		PlacesListResponseDto result = new PlacesListResponseDto();
 		for (Place place : data) {
 			PlacesDto p = new PlacesDto();
 			p.setId(place.getId());
@@ -80,8 +130,6 @@ public class PlaceServiceImpl implements PlaceService{
 			p.setYcoord(place.getLocation().getCoordinates().get(1));
 			result.getData().add(p);
 		}
-		
 		return result;
 	}
-
 }

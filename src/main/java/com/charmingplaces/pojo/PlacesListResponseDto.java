@@ -12,18 +12,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class PlacesNearResponseDto {
-	
+public class PlacesListResponseDto {
+
 	List<PlacesDto> data = new ArrayList<>();
 
-	@Data
-	@AllArgsConstructor
-	@NoArgsConstructor
-	@ToString
-	public static class PlacesDto {
-		private String id;
-		private String name;
-		private double xcoord;
-		private double ycoord;
-	}
 }
