@@ -1,7 +1,7 @@
 package com.charmingplaces.service;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -12,19 +12,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.charmingplaces.entity.Location;
 import com.charmingplaces.entity.Place;
+import com.charmingplaces.pojo.CreatePlaceRequestDto;
 import com.charmingplaces.pojo.ImageDto;
 import com.charmingplaces.pojo.ImageImgurDto;
-import com.charmingplaces.pojo.CreatePlaceRequestDto;
 
 @Service
 public class ImageUploadServiceImpl implements ImageUploadService {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(ImageServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ImageUploadServiceImpl.class);
 
 	private String imgurClientID = "Client-ID 26ade6c10d030fc";
 
@@ -73,12 +72,15 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 
 		LOG.debug("response: {}", response);
 		
+		ImageDto imgDtoResponse = Optional.ofNullable(response)
+				.orElseThrow(() -> new RuntimeException("No se pudo recuperar la imagen"));
+
 		// Recupero el objeto dentro de data y lo guardo en bbdd
-		imageService.save(response.getData());
+		imageService.save(imgDtoResponse.getData());
 
 		Place place = new Place();
-		place.setImageId(response.getData().getId());
-		place.setName(response.getData().getName());
+		place.setImageId(imgDtoResponse.getData().getId());
+		place.setName(imgDtoResponse.getData().getName());
 		place.setCity(photo.getCity());
 		place.setAddress(photo.getAddress());
 		

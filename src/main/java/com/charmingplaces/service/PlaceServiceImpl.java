@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.charmingplaces.controller.PlaceController;
 import com.charmingplaces.entity.Place;
 import com.charmingplaces.pojo.PlacesDto;
 import com.charmingplaces.pojo.PlacesInsideAreaRequestDto;
@@ -21,7 +21,7 @@ import com.charmingplaces.repository.PlaceRepository;
 @Service
 public class PlaceServiceImpl implements PlaceService{
 	
-	private static final Logger LOG = LoggerFactory.getLogger(PlaceController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PlaceServiceImpl.class);
 
 	@Autowired
 	PlaceRepository repo;
@@ -55,9 +55,7 @@ public class PlaceServiceImpl implements PlaceService{
 		
 		Place oldPlace = repo.findById(place.getId()).orElse(null);
 
-		Optional<Place> result = Optional.ofNullable(oldPlace);
-
-		return result;
+		return Optional.ofNullable(oldPlace);
 	}
 
 	@Override
@@ -67,12 +65,12 @@ public class PlaceServiceImpl implements PlaceService{
 		String coordinates = String.format("%s,%s", placesNearRequestDto.getXcoord(),placesNearRequestDto.getYcoord() );
 		String queryFormat = String.format(query, 1000, coordinates);
 		
-		BasicQuery bquery = new BasicQuery(queryFormat);
-		
+		Query bquery = new BasicQuery(queryFormat).limit(100);
 		List<Place> data = mongoTemplate.find(bquery, Place.class);
 		
 		PlacesListResponseDto result = placesToplacesDto(data);
 		
+		LOG.info("lugares encontrados {} : {}", result.getData().size(), result.getData());
 		return result;
 	}
 
@@ -85,17 +83,12 @@ public class PlaceServiceImpl implements PlaceService{
 		String listCoordinates = getBoxPoints(request);
 		String queryFormat = String.format(query, listCoordinates);
 
-		LOG.info("query : {}", queryFormat);
-		
-		
-		BasicQuery bquery = new BasicQuery(queryFormat);
-		
+		Query bquery = new BasicQuery(queryFormat).limit(100);
 		List<Place> data = mongoTemplate.find(bquery, Place.class);
 		
 		PlacesListResponseDto result = placesToplacesDto(data);
 		
 		LOG.info("lugares encontrados {} : {}", result.getData().size(), result.getData());
-
 		return result;
 	}
 
@@ -107,15 +100,12 @@ public class PlaceServiceImpl implements PlaceService{
 		sb.append(request.getGeoPointTopLeft().getXcoord());
 		sb.append(",");
 		sb.append(request.getGeoPointTopLeft().getYcoord());
-		sb.append("]");
-		sb.append(",");
-		sb.append("[");
+		sb.append("], [");
 		sb.append(request.getGeoPointBottomRight().getXcoord());
 		sb.append(",");
 		sb.append(request.getGeoPointBottomRight().getYcoord());
 		sb.append("]");
 
-		
 		return sb.toString();
 
 	}
