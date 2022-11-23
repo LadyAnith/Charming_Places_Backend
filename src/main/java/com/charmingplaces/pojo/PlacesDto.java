@@ -12,6 +12,7 @@ import lombok.ToString;
 public class PlacesDto {
 	private String id;
 	private String name;
+	private String url;
 	private double xcoord;
 	private double ycoord;
 }

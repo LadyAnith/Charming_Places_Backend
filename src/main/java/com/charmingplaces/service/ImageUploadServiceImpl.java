@@ -79,7 +79,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 		imageService.save(imgDtoResponse.getData());
 
 		Place place = new Place();
-		place.setImageId(imgDtoResponse.getData().getId());
+		place.setImageId(imgDtoResponse.getData().getImageId());
 		place.setName(imgDtoResponse.getData().getName());
 		place.setCity(photo.getCity());
 		place.setAddress(photo.getAddress());

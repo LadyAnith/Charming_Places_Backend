@@ -10,8 +10,8 @@ import com.charmingplaces.entity.Image;
 import com.charmingplaces.repository.ImageRepository;
 
 @Service
-public class ImageServiceImpl implements ImageService{
-	
+public class ImageServiceImpl implements ImageService {
+
 	@Autowired
 	ImageRepository repo;
 
@@ -33,16 +33,19 @@ public class ImageServiceImpl implements ImageService{
 	@Override
 	public void deleteById(String id) {
 		repo.deleteById(id);
-		
 	}
 
 	@Override
 	public Optional<Image> update(Image image) {
-		
-		Image oldImage = repo.findById(image.getId()).orElse(null);
 
-		Optional<Image> result = Optional.ofNullable(oldImage);
+		Image oldImage = repo.findById(image.get_id()).orElse(null);
 
-		return result;
+		return Optional.ofNullable(oldImage);
+	}
+
+	@Override
+	public Image findByImageId(String imageId) {
+		return repo.findByImageId(imageId).orElse(null);
+
 	}
 }

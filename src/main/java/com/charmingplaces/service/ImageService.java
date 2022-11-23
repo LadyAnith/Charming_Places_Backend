@@ -17,4 +17,6 @@ public interface ImageService {
 
 	public Optional<Image> update(Image image);
 
+	public Image findByImageId(String imageId);
+
 }

@@ -1,7 +1,5 @@
 package com.charmingplaces.entity;
 
-import java.sql.Timestamp;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Image {
 	@Id
 	private String _id;
-	private String id;
+	private String imageId;
 	private String deletehash;
 	private String description;
 	private String title;
@@ -26,7 +24,6 @@ public class Image {
 	private int heigh;
 	private int size;
 	private String link;
-	//TODO esto no va fino llegan numeros de la api de imgur hay que transformarlo a date
-	private Timestamp datetime;
+	private Integer datetime;
 
 }
