@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.security.token;
+package com.charmingplaces.security.token;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.config;
+package com.charmingplaces.config;
 
 import java.io.IOException;
 

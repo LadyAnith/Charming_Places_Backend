@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.security.model;
+package com.charmingplaces.security.model;
 
 import java.util.Collection;
 
@@ -8,6 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import com.google.firebase.auth.UserRecord;
 
 public class User implements Authentication {
+	private static final long serialVersionUID = 1L;
+
 	private UserRecord userRecord;
 
 	public User(UserRecord userRecord) {

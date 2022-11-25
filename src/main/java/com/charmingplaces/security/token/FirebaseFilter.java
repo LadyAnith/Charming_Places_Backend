@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.security.token;
+package com.charmingplaces.security.token;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.apirestfirebase.security.model.Token;
+import com.charmingplaces.security.model.Token;
 
 public class FirebaseFilter extends OncePerRequestFilter {
 

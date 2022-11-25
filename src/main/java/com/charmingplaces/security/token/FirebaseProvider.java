@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.security.token;
+package com.charmingplaces.security.token;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -10,8 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-import com.example.apirestfirebase.security.model.Token;
-import com.example.apirestfirebase.security.model.User;
+import com.charmingplaces.security.model.Token;
+import com.charmingplaces.security.model.User;
 import com.google.firebase.auth.AuthErrorCode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;

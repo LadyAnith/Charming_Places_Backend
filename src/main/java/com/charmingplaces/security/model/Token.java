@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.security.model;
+package com.charmingplaces.security.model;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 

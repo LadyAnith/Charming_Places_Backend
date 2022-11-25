@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.dto;
+package com.charmingplaces.pojo;
 
 
 public class MessageDto {

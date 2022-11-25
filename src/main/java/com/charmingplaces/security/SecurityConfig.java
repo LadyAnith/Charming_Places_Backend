@@ -1,4 +1,4 @@
-package com.example.apirestfirebase.security;
+package com.charmingplaces.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -7,9 +7,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import com.example.apirestfirebase.security.token.FirebaseEntryPoint;
-import com.example.apirestfirebase.security.token.FirebaseFilter;
-import com.example.apirestfirebase.security.token.FirebaseProvider;
+import com.charmingplaces.security.token.FirebaseEntryPoint;
+import com.charmingplaces.security.token.FirebaseFilter;
+import com.charmingplaces.security.token.FirebaseProvider;
 
 @Configuration
 public class SecurityConfig {

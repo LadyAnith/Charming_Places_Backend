@@ -1,11 +1,11 @@
-package com.example.apirestfirebase.controller;
+package com.charmingplaces.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.apirestfirebase.dto.MessageDto;
+import com.charmingplaces.pojo.MessageDto;
 
 @RestController
 public class HelloController {
