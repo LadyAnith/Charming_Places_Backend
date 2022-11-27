@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Document(collection = "Image")
 public class Image {
 	@Id
-	private String _id;
+	private String id;
 	private String imageId;
 	private String deletehash;
 	private String description;

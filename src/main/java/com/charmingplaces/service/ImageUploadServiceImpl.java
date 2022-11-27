@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
 
+import com.charmingplaces.entity.Image;
 import com.charmingplaces.entity.Location;
 import com.charmingplaces.entity.Place;
 import com.charmingplaces.pojo.CreatePlaceRequestDto;
@@ -40,12 +41,13 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 		String url = "https://api.imgur.com/3/upload";
 
 		// Este es el cuerpo que vamos a mandar a la api
-		ImageImgurDto imageImgurDto = new ImageImgurDto();
-		imageImgurDto.setImage(Base64Utils.encodeToString(photo.getImage()));
-		imageImgurDto.setDescription("");
-		imageImgurDto.setName(UUID.randomUUID() +  ".jpg");
-		imageImgurDto.setTitle(photo.getName());
-		imageImgurDto.setType("base64");
+		ImageImgurDto imageImgurDto = ImageImgurDto.builder()
+			.image(Base64Utils.encodeToString(photo.getImage()))
+			.description("")
+			.name(UUID.randomUUID() +  ".jpg")
+			.title(photo.getName())
+			.type("base64")
+			.build();
 
 		// estas son las cabeceras, dado que vamos a subir contenido y requiere
 		// autenticación pues:
@@ -76,13 +78,14 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 				.orElseThrow(() -> new RuntimeException("No se pudo recuperar la imagen"));
 
 		// Recupero el objeto dentro de data y lo guardo en bbdd
-		imageService.save(imgDtoResponse.getData());
+		Image image = imageService.save(imgDtoResponse.getData());
 
-		Place place = new Place();
-		place.setImageId(imgDtoResponse.getData().getImageId());
-		place.setName(imgDtoResponse.getData().getName());
-		place.setCity(photo.getCity());
-		place.setAddress(photo.getAddress());
+		Place place = Place.builder()
+				.imageId(image.getImageId())
+				.name(image.getName())
+				.city(photo.getCity())
+				.address(photo.getAddress())
+				.build();
 		
 		Location location = new Location();
 		location.setCoordinates(Arrays.asList(photo.getXcoord(), photo.getYcoord()));

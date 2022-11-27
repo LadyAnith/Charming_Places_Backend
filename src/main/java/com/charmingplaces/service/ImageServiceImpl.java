@@ -27,6 +27,8 @@ public class ImageServiceImpl implements ImageService {
 
 	@Override
 	public Image save(Image image) {
+		image.setImageId(image.getId());
+
 		return repo.save(image);
 	}
 
@@ -38,7 +40,7 @@ public class ImageServiceImpl implements ImageService {
 	@Override
 	public Optional<Image> update(Image image) {
 
-		Image oldImage = repo.findById(image.get_id()).orElse(null);
+		Image oldImage = repo.findById(image.getId()).orElse(null);
 
 		return Optional.ofNullable(oldImage);
 	}

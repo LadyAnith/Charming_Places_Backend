@@ -17,7 +17,7 @@ import com.google.firebase.FirebaseOptions;
 @Configuration
 public class FirebaseConfig {
 
-	private static final Logger logger = LoggerFactory.getLogger(FirebaseConfig.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FirebaseConfig.class);
 
 	@Value("${firebase.config.path}")
 	private String configPath;
@@ -29,7 +29,7 @@ public class FirebaseConfig {
 				.setCredentials(GoogleCredentials.fromStream(resource.getInputStream())).build();
 
 		FirebaseApp.initializeApp(options);
-		logger.info("App name:{} ", FirebaseApp.getInstance().getName());
+		LOG.info("App name:{} ", FirebaseApp.getInstance().getName());
 	}
 }
 

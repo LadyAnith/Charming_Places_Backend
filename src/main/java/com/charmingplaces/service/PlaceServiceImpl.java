@@ -140,8 +140,7 @@ public class PlaceServiceImpl implements PlaceService {
 			URL url = new URL(imageurl);
 			BufferedInputStream bis = new BufferedInputStream(url.openConnection().getInputStream());
 			byte[] sourceBytes = IOUtils.toByteArray(bis);
-			String encodedString = Base64.getEncoder().encodeToString(sourceBytes);
-			return encodedString;
+			return Base64.getEncoder().encodeToString(sourceBytes);
 		} catch (IOException e) {
 			return "";
 		}

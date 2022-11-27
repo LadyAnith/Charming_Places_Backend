@@ -96,26 +96,12 @@ public class PlaceController {
 	}
 
 	@PostMapping(value = "/img")
-	public ResponseEntity<CreatePlaceRequestDto> addPhoto(@RequestBody CreatePlaceRequestDto p) {
+	public ResponseEntity<CreatePlaceRequestDto> addPhoto(@RequestBody CreatePlaceRequestDto request) {
+		LOG.info("ENTRANDO en addPhoto request : {}", request);
 
-//		Path path = Paths.get("/users/Anith/desktop/imagen.jpg");
-//		Files.write(path, p.getImage());
-
-		CreatePlaceRequestDto result = imageUploadService.uploadImage(p);
-		
-		return ResponseEntity.ok(result);
-	}
-
-	// Se va a usar este endpoint para simular desde postman que mandamos la info
-	// como si fuese android
-	@PostMapping(value = "/imgSimulaAndroid")
-	public ResponseEntity<CreatePlaceRequestDto> addPhotoSimulaAndroid(@RequestBody CreatePlaceRequestDto p) {
-
-		CreatePlaceRequestDto result = imageUploadService.uploadImage(p);
+		CreatePlaceRequestDto result = imageUploadService.uploadImage(request);
 
 		return ResponseEntity.ok(result);
 	}
-	
-	
 
 }
