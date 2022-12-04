@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.charmingplaces.entity.Image;
 import com.charmingplaces.entity.Place;
+import com.charmingplaces.entity.Vote;
 import com.charmingplaces.pojo.PlacesDto;
 import com.charmingplaces.pojo.PlacesInsideAreaRequestDto;
 import com.charmingplaces.pojo.PlacesListResponseDto;
@@ -26,6 +27,8 @@ import com.charmingplaces.repository.PlaceRepository;
 
 @Service
 public class PlaceServiceImpl implements PlaceService {
+
+	private static final String LUGARES_ENCONTRADOS = "lugares encontrados {} : {}";
 
 	private static final Logger LOG = LoggerFactory.getLogger(PlaceServiceImpl.class);
 
@@ -38,14 +41,56 @@ public class PlaceServiceImpl implements PlaceService {
 	@Autowired
 	MongoTemplate mongoTemplate;
 
+	@Autowired
+	VoteService voteService;
+
 	@Override
-	public List<Place> findAll() {
-		return repo.findAll();
+	public PlacesListResponseDto findAll(String userId) {
+
+		PlacesListResponseDto result = placesToPlacesDto(repo.findAll(), userId);
+
+		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
+		return result;
+
 	}
 
 	@Override
 	public Place findById(String id) {
 		return repo.findById(id).orElse(null);
+	}
+
+	@Override
+	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto, String userId) {
+
+		String query = "{location: {$near: {$maxDistance: %s, $geometry: {type: \"Point\", coordinates: [%s]}}}}";
+		String coordinates = String.format("%s,%s", placesNearRequestDto.getXcoord(), placesNearRequestDto.getYcoord());
+		String queryFormat = String.format(query, 1000, coordinates);
+
+		Query bquery = new BasicQuery(queryFormat).limit(100);
+		List<Place> data = mongoTemplate.find(bquery, Place.class);
+
+		PlacesListResponseDto result = placesToPlacesDto(data, userId);
+
+		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
+		return result;
+	}
+
+	@Override
+	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request, String userId) {
+
+		String query = "{location: {$geoWithin: {$box: [%s]}}}";
+
+		String listCoordinates = getBoxPoints(request);
+		String queryFormat = String.format(query, listCoordinates);
+
+		Query bquery = new BasicQuery(queryFormat).limit(100);
+		List<Place> data = mongoTemplate.find(bquery, Place.class);
+
+
+		PlacesListResponseDto result = placesToPlacesDto(data, userId);
+
+		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
+		return result;
 	}
 
 	@Override
@@ -62,43 +107,18 @@ public class PlaceServiceImpl implements PlaceService {
 	@Override
 	public Optional<Place> update(Place place) {
 
-		Place oldPlace = repo.findById(place.getId()).orElse(null);
+		Optional<Place> currentPlace = repo.findById(place.getId());
+		if (currentPlace.isPresent()) {
+			Place placePersist = currentPlace.get();
+			placePersist.setVotes(place.getVotes());
 
-		return Optional.ofNullable(oldPlace);
+			return Optional.ofNullable(repo.save(placePersist));
+		}
+
+		return Optional.empty();
 	}
 
-	@Override
-	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto) {
-
-		String query = "{location: {$near: {$maxDistance: %s, $geometry: {type: \"Point\", coordinates: [%s]}}}}";
-		String coordinates = String.format("%s,%s", placesNearRequestDto.getXcoord(), placesNearRequestDto.getYcoord());
-		String queryFormat = String.format(query, 1000, coordinates);
-
-		Query bquery = new BasicQuery(queryFormat).limit(100);
-		List<Place> data = mongoTemplate.find(bquery, Place.class);
-
-		PlacesListResponseDto result = placesToplacesDto(data);
-
-		LOG.info("lugares encontrados {} : {}", result.getData().size(), result.getData());
-		return result;
-	}
-
-	@Override
-	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request) {
-
-		String query = "{location: {$geoWithin: {$box: [%s]}}}";
-
-		String listCoordinates = getBoxPoints(request);
-		String queryFormat = String.format(query, listCoordinates);
-
-		Query bquery = new BasicQuery(queryFormat).limit(100);
-		List<Place> data = mongoTemplate.find(bquery, Place.class);
-
-		PlacesListResponseDto result = placesToplacesDto(data);
-
-		LOG.info("lugares encontrados {} : {}", result.getData().size(), result.getData());
-		return result;
-	}
+// METODOS AUXILIARES
 
 	private String getBoxPoints(PlacesInsideAreaRequestDto request) {
 		StringBuilder sb = new StringBuilder();
@@ -117,7 +137,7 @@ public class PlaceServiceImpl implements PlaceService {
 
 	}
 
-	private PlacesListResponseDto placesToplacesDto(List<Place> data) {
+	private PlacesListResponseDto placesToPlacesDto(List<Place> data, String userId) {
 		PlacesListResponseDto result = new PlacesListResponseDto();
 		for (Place place : data) {
 			PlacesDto p = new PlacesDto();
@@ -125,6 +145,10 @@ public class PlaceServiceImpl implements PlaceService {
 			p.setName(place.getName());
 			p.setXcoord(place.getLocation().getCoordinates().get(0));
 			p.setYcoord(place.getLocation().getCoordinates().get(1));
+			p.setVotes(place.getVotes());
+
+			Vote voteUser = voteService.findByUserIdAndPlace(userId, p.getId());
+			p.setVoted(voteUser != null);
 
 			Image imageData = imageService.findByImageId(place.getImageId());
 			p.setUrl(imageToBase64(imageData.getLink()));

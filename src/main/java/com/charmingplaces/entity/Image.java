@@ -25,5 +25,6 @@ public class Image {
 	private int size;
 	private String link;
 	private Integer datetime;
+	private String userId;
 
 }

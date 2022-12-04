@@ -4,5 +4,5 @@ import com.charmingplaces.pojo.CreatePlaceRequestDto;
 
 public interface ImageUploadService {
 
-	public CreatePlaceRequestDto uploadImage(CreatePlaceRequestDto photo);
+	public CreatePlaceRequestDto uploadImage(String userId, CreatePlaceRequestDto photo);
 }

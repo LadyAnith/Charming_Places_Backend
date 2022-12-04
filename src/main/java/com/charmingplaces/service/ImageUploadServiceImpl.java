@@ -35,7 +35,18 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 	PlaceService placeService;
 
 	@Override
-	public CreatePlaceRequestDto uploadImage(CreatePlaceRequestDto photo) {
+	public CreatePlaceRequestDto uploadImage(String userId, CreatePlaceRequestDto photo) {
+		ImageDto imageDataFromImgur = createImageInImgur(photo);
+
+		Image image = persistImage(userId, imageDataFromImgur);
+		
+		persistPlace(userId, photo, image);
+		
+		return photo;
+
+	}
+
+	private ImageDto createImageInImgur(CreatePlaceRequestDto photo) {
 		// Esta es la URL a donde vamos a mandar o consultar datos, en este caso la de
 		// imgur para subir fotos
 		String url = "https://api.imgur.com/3/upload";
@@ -73,28 +84,23 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 		// en response están los datos de la imagen que hemos guardado en imgur
 
 		LOG.debug("response: {}", response);
-		
-		ImageDto imgDtoResponse = Optional.ofNullable(response)
-				.orElseThrow(() -> new RuntimeException("No se pudo recuperar la imagen"));
-
-		// Recupero el objeto dentro de data y lo guardo en bbdd
-		Image image = imageService.save(imgDtoResponse.getData());
-
-		Place place = Place.builder()
-				.imageId(image.getImageId())
-				.name(image.getName())
-				.city(photo.getCity())
-				.address(photo.getAddress())
-				.build();
-		
-		Location location = new Location();
-		location.setCoordinates(Arrays.asList(photo.getXcoord(), photo.getYcoord()));
-		place.setLocation(location );
-
-		placeService.save(place);
-		
-		return photo;
-
+		return Optional.ofNullable(response).orElseThrow(() -> new RuntimeException("No se pudo recuperar la imagen"));
 	}
 
+	private Image persistImage(String userId, ImageDto imgDtoResponse) {
+		// almaceno la referencia de la imagen de imgur en bbdd y retorno su objeto
+		// persistido
+		return imageService.save(userId, imgDtoResponse.getData());
+	}
+
+	private void persistPlace(String userId, CreatePlaceRequestDto photo, Image image) {
+		Place place = Place.builder().imageId(image.getImageId()).name(image.getName()).city(photo.getCity())
+				.address(photo.getAddress()).userId(userId).build();
+
+		Location location = new Location();
+		location.setCoordinates(Arrays.asList(photo.getXcoord(), photo.getYcoord()));
+		place.setLocation(location);
+
+		placeService.save(place);
+	}
 }

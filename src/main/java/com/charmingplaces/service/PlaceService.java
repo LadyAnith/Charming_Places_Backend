@@ -1,6 +1,5 @@
 package com.charmingplaces.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.charmingplaces.entity.Place;
@@ -10,9 +9,13 @@ import com.charmingplaces.pojo.PlacesNearRequestDto;
 
 
 public interface PlaceService {
-	public List<Place> findAll();
+	public PlacesListResponseDto findAll(String userId);
 
 	public Place findById(String id);
+
+	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto, String userId);
+
+	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request, String userId);
 
 	public Place save(Place place);
 
@@ -20,8 +23,5 @@ public interface PlaceService {
 
 	public Optional<Place> update(Place place);
 
-	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto);
-
-	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request);
 
 }

@@ -1,6 +1,7 @@
 package com.charmingplaces.entity;
 
-
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,18 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "Place")
-public class Place{
-	
-	@Id
-	private String id; 
-	private Location location;
-	private String imageId;
-	private String address;
-	private String city;
-	private String name;
-	@Builder.Default
-	private Integer votes = 0;
-	private String userId;
+@Document(collection = "Vote")
+public class Vote {
 
+	@Id
+	private String userId;
+	@Builder.Default
+	private Set<String> places = new HashSet<>();
 }

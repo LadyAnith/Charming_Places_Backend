@@ -11,12 +11,13 @@ public interface ImageService {
 
 	public Image findById(String id);
 
-	public Image save(Image image);
+	public Image save(String userId, Image image);
 
 	public void deleteById(String id);
 
 	public Optional<Image> update(Image image);
 
 	public Image findByImageId(String imageId);
+
 
 }

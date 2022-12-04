@@ -1,6 +1,7 @@
 package com.charmingplaces.pojo;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -9,10 +10,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class PlacesDto {
 	private String id;
 	private String name;
 	private String url;
 	private double xcoord;
 	private double ycoord;
+	private Integer votes;
+	private boolean voted;
 }

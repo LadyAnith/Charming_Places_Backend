@@ -26,8 +26,9 @@ public class ImageServiceImpl implements ImageService {
 	}
 
 	@Override
-	public Image save(Image image) {
+	public Image save(String userId, Image image) {
 		image.setImageId(image.getId());
+		image.setUserId(userId);
 
 		return repo.save(image);
 	}
