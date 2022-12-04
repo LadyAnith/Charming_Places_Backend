@@ -94,8 +94,12 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 	}
 
 	private void persistPlace(String userId, CreatePlaceRequestDto photo, Image image) {
-		Place place = Place.builder().imageId(image.getImageId()).name(image.getName()).city(photo.getCity())
-				.address(photo.getAddress()).userId(userId).build();
+		Place place = Place.builder()
+				.imageId(image.getImageId())
+				.name(photo.getName())
+				.city(photo.getCity())
+				.address(photo.getAddress())
+				.userId(userId).build();
 
 		Location location = new Location();
 		location.setCoordinates(Arrays.asList(photo.getXcoord(), photo.getYcoord()));

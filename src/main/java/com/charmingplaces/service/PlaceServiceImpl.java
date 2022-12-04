@@ -13,6 +13,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Query;
@@ -49,7 +51,8 @@ public class PlaceServiceImpl implements PlaceService {
 	@Override
 	public PlacesListResponseDto findAll(String userId) {
 
-		PlacesListResponseDto result = placesToPlacesListResponseDto(repo.findAll(), userId);
+		Sort sort = Sort.by(Direction.DESC, "votes");
+		PlacesListResponseDto result = placesToPlacesListResponseDto(repo.findAll(sort), userId);
 
 		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
 		return result;
