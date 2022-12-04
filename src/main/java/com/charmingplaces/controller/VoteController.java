@@ -40,8 +40,7 @@ public class VoteController {
 		String placeId = voteRequestDto.getPlaceId();
 		String userId = voteRequestDto.getUserId();
 		
-		Vote vote = voteService.findByUserIdAndPlace(userId,
-				placeId);
+		Vote vote = voteService.findById(userId);
 
 		// Create or update vote
 		if (vote == null) {
@@ -63,7 +62,7 @@ public class VoteController {
 		String placeId = voteRequestDto.getPlaceId();
 		String userId = voteRequestDto.getUserId();
 
-		Vote vote = voteService.findByUserIdAndPlace(userId, placeId);
+		Vote vote = voteService.findById(userId);
 
 		// Create or update vote
 		if (vote == null) {
