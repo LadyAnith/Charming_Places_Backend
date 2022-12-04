@@ -20,6 +20,11 @@ public class VoteServiceImpl implements VoteService {
 	MongoTemplate mongoTemplate;
 
 	@Override
+	public Vote findById(String userId) {
+		return voteRepository.findById(userId).orElse(null);
+	}
+
+	@Override
 	public Vote findByUserIdAndPlace(String userId, String placeId) {
 		return voteRepository.findByUserIdAndPlaces(userId, placeId).orElse(null);
 	}
@@ -46,4 +51,5 @@ public class VoteServiceImpl implements VoteService {
 
 		return Optional.ofNullable(voteRepository.save(vote));
 	}
+
 }

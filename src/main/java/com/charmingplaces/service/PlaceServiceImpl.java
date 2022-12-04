@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +49,7 @@ public class PlaceServiceImpl implements PlaceService {
 	@Override
 	public PlacesListResponseDto findAll(String userId) {
 
-		PlacesListResponseDto result = placesToPlacesDto(repo.findAll(), userId);
+		PlacesListResponseDto result = placesToPlacesListResponseDto(repo.findAll(), userId);
 
 		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
 		return result;
@@ -60,6 +62,20 @@ public class PlaceServiceImpl implements PlaceService {
 	}
 
 	@Override
+	public PlacesListResponseDto findFavorites(String userId) {
+
+		Vote vote = voteService.findById(userId);
+		if (vote == null) {
+			return new PlacesListResponseDto();
+		}
+
+		Set<String> favoritePlaces = vote.getPlaces();
+		Iterable<Place> iterable = repo.findAllById(favoritePlaces);
+		List<Place> placeList = IterableUtils.toList(iterable);
+		return placesToPlacesListResponseDto(placeList, userId);
+	}
+
+	@Override
 	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto, String userId) {
 
 		String query = "{location: {$near: {$maxDistance: %s, $geometry: {type: \"Point\", coordinates: [%s]}}}}";
@@ -69,7 +85,7 @@ public class PlaceServiceImpl implements PlaceService {
 		Query bquery = new BasicQuery(queryFormat).limit(100);
 		List<Place> data = mongoTemplate.find(bquery, Place.class);
 
-		PlacesListResponseDto result = placesToPlacesDto(data, userId);
+		PlacesListResponseDto result = placesToPlacesListResponseDto(data, userId);
 
 		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
 		return result;
@@ -87,7 +103,7 @@ public class PlaceServiceImpl implements PlaceService {
 		List<Place> data = mongoTemplate.find(bquery, Place.class);
 
 
-		PlacesListResponseDto result = placesToPlacesDto(data, userId);
+		PlacesListResponseDto result = placesToPlacesListResponseDto(data, userId);
 
 		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
 		return result;
@@ -137,7 +153,7 @@ public class PlaceServiceImpl implements PlaceService {
 
 	}
 
-	private PlacesListResponseDto placesToPlacesDto(List<Place> data, String userId) {
+	private PlacesListResponseDto placesToPlacesListResponseDto(List<Place> data, String userId) {
 		PlacesListResponseDto result = new PlacesListResponseDto();
 		for (Place place : data) {
 			PlacesDto p = new PlacesDto();
@@ -170,4 +186,6 @@ public class PlaceServiceImpl implements PlaceService {
 		}
 
 	}
+
+
 }

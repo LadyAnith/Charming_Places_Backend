@@ -35,11 +35,16 @@ public class PlaceController {
 	private ImageUploadService imageUploadService;
 	
 	@GetMapping
-	public ResponseEntity<PlacesListResponseDto> readAll(@RequestHeader Map<String, String> headers) {
+	public ResponseEntity<PlacesListResponseDto> findAll(@RequestHeader Map<String, String> headers) {
 		String userId = headers.get(USER_ID);
 		return ResponseEntity.ok(service.findAll(userId));
 	}
 
+	@GetMapping("/findFavorites")
+	public ResponseEntity<PlacesListResponseDto> findFavorites(@RequestHeader Map<String, String> headers) {
+		String userId = headers.get(USER_ID);
+		return ResponseEntity.ok(service.findFavorites(userId));
+	}
 
 	@GetMapping("/findNear")
 	public ResponseEntity<PlacesListResponseDto> findNear(@RequestHeader Map<String, String> headers,

@@ -54,8 +54,7 @@ public class VoteController {
 		
 		Place existingPlace = updatePlaceVotes(placeId);
 
-		PlacesDto result = buildResponse(existingPlace);
-		result.setVoted(true);
+		PlacesDto result = buildResponse(existingPlace, userId);
 		return ResponseEntity.ok(result );
 	}
 
@@ -76,8 +75,7 @@ public class VoteController {
 
 		Place existingPlace = updatePlaceVotes(placeId);
 
-		PlacesDto result = buildResponse(existingPlace);
-		result.setVoted(false);
+		PlacesDto result = buildResponse(existingPlace, userId);
 		return ResponseEntity.ok(result);
 	}
 
@@ -91,11 +89,13 @@ public class VoteController {
 		return existingPlace;
 	}
 
-	private PlacesDto buildResponse(Place existingPlace) {
+	private PlacesDto buildResponse(Place existingPlace, String userId) {
+		Vote voteUser = voteService.findByUserIdAndPlace(userId, existingPlace.getId());
 		return PlacesDto.builder()
 				.id(existingPlace.getId())
 				.name(existingPlace.getName())
 				.votes(existingPlace.getVotes())
+				.voted(voteUser != null)
 				.build();
 	}
 }

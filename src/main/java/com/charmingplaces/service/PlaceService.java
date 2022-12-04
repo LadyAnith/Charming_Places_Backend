@@ -13,6 +13,8 @@ public interface PlaceService {
 
 	public Place findById(String id);
 
+	public PlacesListResponseDto findFavorites(String userId);
+
 	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto, String userId);
 
 	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request, String userId);
@@ -22,6 +24,5 @@ public interface PlaceService {
 	public void deleteById(String id);
 
 	public Optional<Place> update(Place place);
-
 
 }
