@@ -11,6 +11,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Clase que guarda los lugares votados por un usuario
+ * 
+ * @author Ana María Ramírez Dorado
+ *
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

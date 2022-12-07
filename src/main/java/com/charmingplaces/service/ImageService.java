@@ -1,23 +1,18 @@
 package com.charmingplaces.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.charmingplaces.entity.Image;
 
-
 public interface ImageService {
-	public List<Image> findAll();
 
-	public Image findById(String id);
-
+	/**
+	 * Guarda la información de una imagen y la id de usuario para conocer que
+	 * usuario ha guardado esa imagen
+	 */
 	public Image save(String userId, Image image);
 
-	public void deleteById(String id);
-
-	public Optional<Image> update(Image image);
-
+	/**
+	 * Busca la información de una imagen por su id en la BBDD
+	 */
 	public Image findByImageId(String imageId);
-
 
 }

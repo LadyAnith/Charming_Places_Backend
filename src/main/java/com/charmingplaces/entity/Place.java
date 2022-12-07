@@ -10,6 +10,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Clase que guarda la información de un lugar.
+ * 
+ * @author Ana María Ramírez Dorado
+ *
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

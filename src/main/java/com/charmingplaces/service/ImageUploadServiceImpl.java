@@ -34,29 +34,43 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 	@Autowired
 	PlaceService placeService;
 
+	/**
+	 * {@link ImageUploadService#uploadImage()}
+	 */
 	@Override
-	public CreatePlaceRequestDto uploadImage(String userId, CreatePlaceRequestDto photo) {
-		ImageDto imageDataFromImgur = createImageInImgur(photo);
+	public void uploadImage(String userId, CreatePlaceRequestDto capture) {
+		ImageDto imageDataFromImgur = createImageInImgur(capture);
 
-		Image image = persistImage(userId, imageDataFromImgur);
+		Image image = saveImageInBBDD(userId, imageDataFromImgur);
 		
-		persistPlace(userId, photo, image);
+		savePlaceInBBDD(userId, capture, image);
 		
-		return photo;
-
 	}
 
-	private ImageDto createImageInImgur(CreatePlaceRequestDto photo) {
+	// METODOS AUXILIARES
+
+	/**
+	 * Este método crea una imagen en imgur.
+	 * 
+	 * Convierte la imagen en Base64 y manda la información que nos pide imgur para
+	 * guardar la imagen.
+	 * 
+	 * 
+	 * 
+	 * @param capture captura realiza por el usuario
+	 * @return respuesta de imgur
+	 */
+	private ImageDto createImageInImgur(CreatePlaceRequestDto capture) {
 		// Esta es la URL a donde vamos a mandar o consultar datos, en este caso la de
 		// imgur para subir fotos
 		String url = "https://api.imgur.com/3/upload";
 
 		// Este es el cuerpo que vamos a mandar a la api
 		ImageImgurDto imageImgurDto = ImageImgurDto.builder()
-			.image(Base64Utils.encodeToString(photo.getImage()))
+				.image(Base64Utils.encodeToString(capture.getImage()))
 			.description("")
 			.name(UUID.randomUUID() +  ".jpg")
-			.title(photo.getName())
+				.title(capture.getName())
 			.type("base64")
 			.build();
 
@@ -87,22 +101,36 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 		return Optional.ofNullable(response).orElseThrow(() -> new RuntimeException("No se pudo recuperar la imagen"));
 	}
 
-	private Image persistImage(String userId, ImageDto imgDtoResponse) {
+	/**
+	 * Guarda la información de la imagen de imgur y el id del usuario en BBDD
+	 * 
+	 * @param userId         id del usuario
+	 * @param imgDtoResponse respuesta de la api imgur
+	 * @return información guardada de imgur en la BBDD
+	 */
+	private Image saveImageInBBDD(String userId, ImageDto imgDtoResponse) {
 		// almaceno la referencia de la imagen de imgur en bbdd y retorno su objeto
 		// persistido
 		return imageService.save(userId, imgDtoResponse.getData());
 	}
 
-	private void persistPlace(String userId, CreatePlaceRequestDto photo, Image image) {
+	/**
+	 * Guarda el nuevo lugar en la BBDD, con el id de la imagen, la información de
+	 * la captura y el id del usuario que ha hecho la captura, además guarda las
+	 * coordenadas de la captura donde se ha realizado la foto
+	 * 
+	 * @param userId  id del usuario
+	 * @param capture información de la captura
+	 * @param image   información de la imagen de imgurl en la BBDD
+	 */
+	private void savePlaceInBBDD(String userId, CreatePlaceRequestDto capture, Image image) {
 		Place place = Place.builder()
 				.imageId(image.getImageId())
-				.name(photo.getName())
-				.city(photo.getCity())
-				.address(photo.getAddress())
+				.name(capture.getName()).city(capture.getCity()).address(capture.getAddress())
 				.userId(userId).build();
 
 		Location location = new Location();
-		location.setCoordinates(Arrays.asList(photo.getXcoord(), photo.getYcoord()));
+		location.setCoordinates(Arrays.asList(capture.getXcoord(), capture.getYcoord()));
 		place.setLocation(location);
 
 		placeService.save(place);

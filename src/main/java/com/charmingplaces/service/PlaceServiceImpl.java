@@ -40,7 +40,7 @@ public class PlaceServiceImpl implements PlaceService {
 	ImageService imageService;
 
 	@Autowired
-	PlaceRepository repo;
+	PlaceRepository placeRepository;
 
 	@Autowired
 	MongoTemplate mongoTemplate;
@@ -48,22 +48,31 @@ public class PlaceServiceImpl implements PlaceService {
 	@Autowired
 	VoteService voteService;
 
+	/**
+	 * {@link PlaceService#findAll()}
+	 */
 	@Override
 	public PlacesListResponseDto findAll(String userId) {
 
 		Sort sort = Sort.by(Direction.DESC, "votes");
-		PlacesListResponseDto result = placesToPlacesListResponseDto(repo.findAll(sort), userId);
+		PlacesListResponseDto result = placesToPlacesListResponseDto(placeRepository.findAll(sort), userId);
 
 		LOG.info(LUGARES_ENCONTRADOS, result.getData().size(), result.getData());
 		return result;
 
 	}
 
+	/**
+	 * {@link PlaceService#findById()}
+	 */
 	@Override
 	public Place findById(String id) {
-		return repo.findById(id).orElse(null);
+		return placeRepository.findById(id).orElse(null);
 	}
 
+	/**
+	 * {@link PlaceService#findFavorites()}
+	 */
 	@Override
 	public PlacesListResponseDto findFavorites(String userId) {
 
@@ -72,12 +81,15 @@ public class PlaceServiceImpl implements PlaceService {
 			return new PlacesListResponseDto();
 		}
 
-		Set<String> favoritePlaces = vote.getPlaces();
-		Iterable<Place> iterable = repo.findAllById(favoritePlaces);
+		Set<String> favoritePlaceIds = vote.getPlaces();
+		Iterable<Place> iterable = placeRepository.findAllById(favoritePlaceIds);
 		List<Place> placeList = IterableUtils.toList(iterable);
 		return placesToPlacesListResponseDto(placeList, userId);
 	}
 
+	/**
+	 * {@link PlaceService#findNear()}
+	 */
 	@Override
 	public PlacesListResponseDto findNear(PlacesNearRequestDto placesNearRequestDto, String userId) {
 
@@ -94,12 +106,15 @@ public class PlaceServiceImpl implements PlaceService {
 		return result;
 	}
 
+	/**
+	 * {@link PlaceService#findPlacesInsideArea()}
+	 */
 	@Override
 	public PlacesListResponseDto findPlacesInsideArea(PlacesInsideAreaRequestDto request, String userId) {
 
 		String query = "{location: {$geoWithin: {$box: [%s]}}}";
 
-		String listCoordinates = getBoxPoints(request);
+		String listCoordinates = getAreaPoints(request);
 		String queryFormat = String.format(query, listCoordinates);
 
 		Query bquery = new BasicQuery(queryFormat).limit(100);
@@ -112,36 +127,43 @@ public class PlaceServiceImpl implements PlaceService {
 		return result;
 	}
 
+	/**
+	 * {@link PlaceService#save()}
+	 */
 	@Override
 	public Place save(Place place) {
-		return repo.save(place);
+		return placeRepository.save(place);
 	}
 
+	/**
+	 * {@link PlaceService#updatePlaceVotes()}
+	 */
 	@Override
-	public void deleteById(String id) {
-		repo.deleteById(id);
+	public Place updatePlaceVotes(Place place) {
 
-	}
-
-	@Override
-	public Optional<Place> update(Place place) {
-
-		Optional<Place> currentPlace = repo.findById(place.getId());
+		Optional<Place> currentPlace = placeRepository.findById(place.getId());
 		if (currentPlace.isPresent()) {
 			Place placePersist = currentPlace.get();
 			placePersist.setVotes(place.getVotes());
 
-			return Optional.ofNullable(repo.save(placePersist));
+			return placeRepository.save(placePersist);
 		}
 
-		return Optional.empty();
+		return null;
 	}
 
 // METODOS AUXILIARES
 
-	private String getBoxPoints(PlacesInsideAreaRequestDto request) {
+	/**
+	 * transforma las coordenadas superior izquierda e inferior derecha en un string
+	 * con el formato de box para usar con mongo ej:
+	 * [TOP_LEFT_xcoord,TOP_LEFT_ycoord],[BOTTOM_RIGHT_xcoord _BOTTOM_RIFHT_ycoord]
+	 * 
+	 * @param request puntos del area
+	 * @return coordenadas transformadas a string
+	 */
+	private String getAreaPoints(PlacesInsideAreaRequestDto request) {
 		StringBuilder sb = new StringBuilder();
-
 		sb.append("[");
 		sb.append(request.getGeoPointTopLeft().getXcoord());
 		sb.append(",");
@@ -156,31 +178,52 @@ public class PlaceServiceImpl implements PlaceService {
 
 	}
 
+	/**
+	 * Este método convierte un listado de Place en PlacesDto.
+	 * 
+	 * Por cada elemento de la lista setea si lo ha votado el usuario.
+	 * 
+	 * Busca los datos de la imagen para setear el contenido de la imagen en Base64
+	 * utilizando el enlace de imgurl.
+	 * 
+	 * y finalmente empaqueta todos los elementos en el objeto PlacesListResponseDto
+	 * 
+	 * @param data   listado de lugares
+	 * @param userId id del usuario
+	 * @return el PlacesListResponseDto que contiene el listado de PlacesDto
+	 */
 	private PlacesListResponseDto placesToPlacesListResponseDto(List<Place> data, String userId) {
 		PlacesListResponseDto result = new PlacesListResponseDto();
 		for (Place place : data) {
-			PlacesDto p = new PlacesDto();
-			p.setId(place.getId());
-			p.setName(place.getName());
-			p.setXcoord(place.getLocation().getCoordinates().get(0));
-			p.setYcoord(place.getLocation().getCoordinates().get(1));
-			p.setVotes(place.getVotes());
+			PlacesDto placeDto = new PlacesDto();
+			placeDto.setId(place.getId());
+			placeDto.setName(place.getName());
+			placeDto.setXcoord(place.getLocation().getCoordinates().get(0));
+			placeDto.setYcoord(place.getLocation().getCoordinates().get(1));
+			placeDto.setVotes(place.getVotes());
 
-			Vote voteUser = voteService.findByUserIdAndPlace(userId, p.getId());
-			p.setVoted(voteUser != null);
+			Vote voteUser = voteService.findByUserIdAndPlaces(userId, placeDto.getId());
+			placeDto.setVoted(voteUser != null);
 
 			Image imageData = imageService.findByImageId(place.getImageId());
-			p.setUrl(imageToBase64(imageData.getLink()));
+			placeDto.setImageContent(imageToBase64(imageData.getLink()));
 
-			result.getData().add(p);
+			result.getData().add(placeDto);
 		}
 		return result;
 	}
 
-	private String imageToBase64(String imageurl) {
+	/**
+	 * Método encargado de extraer la imagen almacenada en Imgur, usando su enlace
+	 * público y convertirla en Base64
+	 * 
+	 * @param imageLink enlace público de imgur
+	 * @return imagen en el formato Base64
+	 */
+	private String imageToBase64(String imageLink) {
 
 		try {
-			URL url = new URL(imageurl);
+			URL url = new URL(imageLink);
 			BufferedInputStream bis = new BufferedInputStream(url.openConnection().getInputStream());
 			byte[] sourceBytes = IOUtils.toByteArray(bis);
 			return Base64.getEncoder().encodeToString(sourceBytes);

@@ -7,6 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 
+ * Clase que guarda la información relevante de una imagen añadida en Imgur
+ * 
+ * @author Ana María Ramírez Dorado
+ *
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -14,7 +14,7 @@ import lombok.ToString;
 public class PlacesDto {
 	private String id;
 	private String name;
-	private String url;
+	private String imageContent;
 	private double xcoord;
 	private double ycoord;
 	private Integer votes;

@@ -1,7 +1,6 @@
 package com.charmingplaces.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,37 +18,46 @@ public class VoteServiceImpl implements VoteService {
 	@Autowired
 	MongoTemplate mongoTemplate;
 
+	/**
+	 * {@link VoteService#findById()}
+	 */
 	@Override
 	public Vote findById(String userId) {
 		return voteRepository.findById(userId).orElse(null);
 	}
 
+	/**
+	 * {@link VoteService#findByUserIdAndPlaces()}
+	 */
 	@Override
-	public Vote findByUserIdAndPlace(String userId, String placeId) {
+	public Vote findByUserIdAndPlaces(String userId, String placeId) {
 		return voteRepository.findByUserIdAndPlaces(userId, placeId).orElse(null);
 	}
 
+	/**
+	 * {@link VoteService#findByPlaceId()}
+	 */
 	@Override
 	public List<Vote> findByPlaceId(String placeId) {
 
 		return voteRepository.findByPlaces(placeId);
 	}
 
+	/**
+	 * {@link VoteService#save()}
+	 */
 	@Override
 	public Vote save(Vote vote) {
 		return voteRepository.save(vote);
 	}
 
+	/**
+	 * {@link VoteService#deleteById()}
+	 */
 	@Override
 	public void deleteById(String id) {
 		voteRepository.deleteById(id);
 
-	}
-
-	@Override
-	public Optional<Vote> update(Vote vote) {
-
-		return Optional.ofNullable(voteRepository.save(vote));
 	}
 
 }
